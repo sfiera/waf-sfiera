@@ -13,6 +13,24 @@ SDKS = {
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.4u.sdk", "-mmacosx-version-min=10.4"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.4u.sdk", "-mmacosx-version-min=10.4"],
     },
+    "10.5": {
+        "CC": "gcc-4.2",
+        "CXX": "g++-4.2",
+        "LINK_CC": "gcc-4.2",
+        "LINK_CXX": "g++-4.2",
+        "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
+        "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
+        "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
+    },
+    "10.6": {
+        "CC": "gcc-4.2",
+        "CXX": "g++-4.2",
+        "LINK_CC": "gcc-4.2",
+        "LINK_CXX": "g++-4.2",
+        "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
+        "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
+        "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
+    },
 }
 
 def options(opt):
