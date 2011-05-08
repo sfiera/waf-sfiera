@@ -39,7 +39,11 @@ def options(opt):
             help="compile against this SDK on darwin")
 
 def configure(cnf):
-    cnf.env.update(SDKS[cnf.options.sdk])
+    for key, val in SDKS[cnf.options.sdk].items():
+        if isinstance(val, list):
+            cnf.env.append_unique(key, val)
+        else:
+            cnf.env[key] = val
 
 
 @extension(".m")
