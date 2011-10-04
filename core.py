@@ -10,11 +10,11 @@ def dedent(s):
 
 def options(opt):
     opt.add_option(
-            "-m", "--mode", action="store", default="dev", choices=["opt", "dev", "dbg"],
+            "-m", "--mode", action="store", default="opt", choices=["opt", "dev", "dbg"],
             help=dedent("""
                 Select a set of compiler options.  Choices are "opt" (optimize for speed of the
                 compiled executable), "dev" (optimize for speed of compilation process), and "dbg"
-                (optimize for ability to debug).  [default: 'dev']
+                (optimize for ability to debug).  [default: 'opt']
             """))
 
     opt.load("platform_%s" % unversioned_sys_platform())
