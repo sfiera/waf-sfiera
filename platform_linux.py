@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from waflib.TaskGen import before_method, feature
+
 
 @feature("universal")
 @before_method("process_source")
