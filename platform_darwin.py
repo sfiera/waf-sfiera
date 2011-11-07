@@ -35,6 +35,15 @@ SDKS = {
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
     },
+    "10.7": {
+        "CC": "gcc-4.2",
+        "CXX": "g++-4.2",
+        "LINK_CC": "gcc-4.2",
+        "LINK_CXX": "g++-4.2",
+        "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
+        "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
+        "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
+    },
 }
 
 ARCH = ["ppc", "i386", "x86_64"]
@@ -42,6 +51,7 @@ SDK_ARCH = {
     "10.4": ["ppc", "i386", "x86_64"],
     "10.5": ["ppc", "i386", "x86_64"],
     "10.6": ["i386", "x86_64"],
+    "10.7": ["i386", "x86_64"],
 }
 
 def options(opt):
