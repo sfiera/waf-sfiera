@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 import os
-from waflib.TaskGen import extension
+import textwrap
+from waflib.TaskGen import before_method, extension, feature
+
+def dedent(s):
+    return textwrap.dedent(s.strip("\n")).strip("\n")
 
 SDKS = {
     "10.4": {
@@ -33,10 +37,23 @@ SDKS = {
     },
 }
 
+ARCH = ["ppc", "i386", "x86_64"]
+SDK_ARCH = {
+    "10.4": ["ppc", "i386", "x86_64"],
+    "10.5": ["ppc", "i386", "x86_64"],
+    "10.6": ["i386", "x86_64"],
+}
+
 def options(opt):
     opt.add_option(
             "--sdk", action="store", default="10.4", choices=sorted(SDKS.keys()),
-            help="compile against this SDK on darwin")
+            help="Compile against this SDK on darwin.  [default: '10.4']")
+    opt.add_option(
+            "--arch", action="append", default=[], choices=ARCH,
+            help=dedent("""
+                Append to the list of architectures to build.  Individual targets may not build
+                on the specified architecture.  [default: SDK-dependent]
+            """))
 
 def configure(cnf):
     for key, val in SDKS[cnf.options.sdk].items():
@@ -44,6 +61,33 @@ def configure(cnf):
             cnf.env.append_unique(key, val)
         else:
             cnf.env[key] = val
+
+    if cnf.options.arch:
+        # If any arch passed via --arch cannot be built against the
+        # selected SDK, raise an error about the first such arch
+        # encountered.
+        bad_arches = [a for a in cnf.options.arch if a not in SDK_ARCH[cnf.options.sdk]]
+        if bad_arches:
+            raise cnf.errors.ConfigurationError(
+                    "cannot build %s on %s" % (bad_arches.pop(0), cnf.options.sdk))
+        cnf.env["UNIVERSAL_ARCHES"] = cnf.options.arch
+    else:
+        cnf.env["UNIVERSAL_ARCHES"] = SDK_ARCH[cnf.options.sdk]
+
+
+@feature("universal")
+@before_method("process_source")
+def build_universal(self):
+    self.env.ARCH = self.bld.env["UNIVERSAL_ARCHES"]
+
+
+@feature("universal32")
+@before_method("process_source")
+def build_universal(self):
+    self.env.ARCH = [a for a in self.bld.env["UNIVERSAL_ARCHES"] if a in ["ppc", "i386"]]
+    if not self.env.ARCH:
+        raise self.bld.errors.ConfigurationError(
+                "%s can only be built 32-bit" % self.target)
 
 
 @extension(".m")
