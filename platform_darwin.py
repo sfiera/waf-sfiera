@@ -16,6 +16,7 @@ SDKS = {
         "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.4u.sdk", "-mmacosx-version-min=10.4"],
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.4u.sdk", "-mmacosx-version-min=10.4"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.4u.sdk", "-mmacosx-version-min=10.4"],
+        "UNIVERSAL_ARCHES": ["ppc", "i386", "x86_64"],
     },
     "10.5": {
         "CC": "gcc-4.2",
@@ -25,6 +26,7 @@ SDKS = {
         "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
+        "UNIVERSAL_ARCHES": ["ppc", "i386", "x86_64"],
     },
     "10.6": {
         "CC": "gcc-4.2",
@@ -34,6 +36,7 @@ SDKS = {
         "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
+        "UNIVERSAL_ARCHES": ["i386", "x86_64"],
     },
     "10.7": {
         "CC": "gcc-4.2",
@@ -43,16 +46,11 @@ SDKS = {
         "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
+        "UNIVERSAL_ARCHES": ["i386", "x86_64"],
     },
 }
 
 ARCH = ["ppc", "i386", "x86_64"]
-SDK_ARCH = {
-    "10.4": ["ppc", "i386", "x86_64"],
-    "10.5": ["ppc", "i386", "x86_64"],
-    "10.6": ["i386", "x86_64"],
-    "10.7": ["i386", "x86_64"],
-}
 
 def options(opt):
     opt.add_option(
@@ -76,13 +74,11 @@ def configure(cnf):
         # If any arch passed via --arch cannot be built against the
         # selected SDK, raise an error about the first such arch
         # encountered.
-        bad_arches = [a for a in cnf.options.arch if a not in SDK_ARCH[cnf.options.sdk]]
+        bad_arches = [a for a in cnf.options.arch if a not in cnf.env["UNIVERSAL_ARCHES"]]
         if bad_arches:
             raise cnf.errors.ConfigurationError(
                     "cannot build %s on %s" % (bad_arches.pop(0), cnf.options.sdk))
         cnf.env["UNIVERSAL_ARCHES"] = cnf.options.arch
-    else:
-        cnf.env["UNIVERSAL_ARCHES"] = SDK_ARCH[cnf.options.sdk]
 
 
 @feature("universal")
