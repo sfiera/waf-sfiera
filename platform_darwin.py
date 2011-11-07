@@ -89,7 +89,7 @@ def build_universal(self):
 
 @feature("universal32")
 @before_method("process_source")
-def build_universal(self):
+def build_universal32(self):
     self.env.ARCH = [a for a in self.bld.env["UNIVERSAL_ARCHES"] if a in ["ppc", "i386"]]
     if not self.env.ARCH:
         raise self.bld.errors.ConfigurationError(
