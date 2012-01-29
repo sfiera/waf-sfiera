@@ -9,40 +9,30 @@ def dedent(s):
 
 SDKS = {
     "10.4": {
-        "CC": "gcc-4.0",
-        "CXX": "g++-4.0",
-        "LINK_CC": "gcc-4.0",
-        "LINK_CXX": "g++-4.0",
         "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.4u.sdk", "-mmacosx-version-min=10.4"],
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.4u.sdk", "-mmacosx-version-min=10.4"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.4u.sdk", "-mmacosx-version-min=10.4"],
         "UNIVERSAL_ARCHES": ["ppc", "i386", "x86_64"],
     },
     "10.5": {
-        "CC": "gcc-4.2",
-        "CXX": "g++-4.2",
-        "LINK_CC": "gcc-4.2",
-        "LINK_CXX": "g++-4.2",
         "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.5.sdk", "-mmacosx-version-min=10.5"],
         "UNIVERSAL_ARCHES": ["ppc", "i386", "x86_64"],
     },
     "10.6": {
-        "CC": "gcc-4.2",
-        "CXX": "g++-4.2",
-        "LINK_CC": "gcc-4.2",
-        "LINK_CXX": "g++-4.2",
         "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.6.sdk", "-mmacosx-version-min=10.6"],
         "UNIVERSAL_ARCHES": ["i386", "x86_64"],
     },
     "10.7": {
-        "CC": "gcc-4.2",
-        "CXX": "g++-4.2",
-        "LINK_CC": "gcc-4.2",
-        "LINK_CXX": "g++-4.2",
+        "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
+        "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
+        "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
+        "UNIVERSAL_ARCHES": ["i386", "x86_64"],
+    },
+    "10.7-clang": {
         "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
         "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
@@ -50,12 +40,58 @@ SDKS = {
     },
 }
 
+COMPILERS = {
+    ("10.4", "gcc"): {
+        "CC": "gcc-4.0",
+        "CXX": "g++-4.0",
+        "LINK_CC": "gcc-4.0",
+        "LINK_CXX": "g++-4.0",
+    },
+    ("10.5", "gcc"): {
+        "CC": "gcc-4.2",
+        "CXX": "g++-4.2",
+        "LINK_CC": "gcc-4.2",
+        "LINK_CXX": "g++-4.2",
+    },
+    ("10.6", "gcc"): {
+        "CC": "gcc-4.2",
+        "CXX": "g++-4.2",
+        "LINK_CC": "gcc-4.2",
+        "LINK_CXX": "g++-4.2",
+    },
+    ("10.7", "gcc"): {
+        "CC": "llvm-gcc-4.2",
+        "CXX": "llvm-g++-4.2",
+        "LINK_CC": "llvm-gcc-4.2",
+        "LINK_CXX": "llvm-g++-4.2",
+    },
+    ("10.6", "clang"): {
+        "CC": "clang",
+        "CXX": "clang++",
+        "LINK_CC": "clang",
+        "LINK_CXX": "clang++",
+    },
+    ("10.7", "clang"): {
+        "CC": "clang",
+        "CXX": "clang++",
+        "LINK_CC": "clang",
+        "LINK_CXX": "clang++",
+    },
+}
+
 ARCH = ["ppc", "i386", "x86_64"]
 
 def options(opt):
+    if not hasattr(opt, "default_sdk"):
+        raise opt.errors.ConfigurationError("must set default_sdk")
+    if not hasattr(opt, "default_compiler"):
+        raise opt.errors.ConfigurationError("must set default_compiler")
     opt.add_option(
-            "--sdk", action="store", default="10.4", choices=sorted(SDKS.keys()),
-            help="Compile against this SDK on darwin.  [default: '10.4']")
+            "--sdk", action="store", default=opt.default_sdk, choices=sorted(SDKS.keys()),
+            help="Compile against this SDK on darwin.  [default: %r]" % opt.default_sdk)
+    opt.add_option(
+            "--compiler", action="store", default=opt.default_compiler, choices=["clang", "gcc"],
+            help="Use this compiler on darwin.  [default: %r]" % opt.default_compiler)
     opt.add_option(
             "--arch", action="append", default=[], choices=ARCH,
             help=dedent("""
@@ -65,6 +101,15 @@ def options(opt):
 
 def configure(cnf):
     for key, val in SDKS[cnf.options.sdk].items():
+        if isinstance(val, list):
+            cnf.env.append_unique(key, val)
+        else:
+            cnf.env[key] = val
+
+    if (cnf.options.sdk, cnf.options.compiler) not in COMPILERS:
+        raise cnf.errors.ConfigurationError(
+                "cannot compile with %s on %s" % (cnf.options.compiler, cnf.options.sdk))
+    for key, val in COMPILERS[cnf.options.sdk, cnf.options.compiler].items():
         if isinstance(val, list):
             cnf.env.append_unique(key, val)
         else:
