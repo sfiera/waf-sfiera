@@ -54,10 +54,10 @@ COMPILERS = {
         "LINK_CXX": "g++-4.2",
     },
     ("10.6", "gcc"): {
-        "CC": "gcc-4.2",
-        "CXX": "g++-4.2",
-        "LINK_CC": "gcc-4.2",
-        "LINK_CXX": "g++-4.2",
+        "CC": "llvm-gcc-4.2",
+        "CXX": "llvm-g++-4.2",
+        "LINK_CC": "llvm-gcc-4.2",
+        "LINK_CXX": "llvm-g++-4.2",
     },
     ("10.7", "gcc"): {
         "CC": "llvm-gcc-4.2",
