@@ -145,3 +145,9 @@ def build_universal32(self):
 def m_hook(self, node):
     "Bind the m file extension to the same rules as c"
     return self.create_compiled_task("c", node)
+
+
+@extension(".mm")
+def m_hook(self, node):
+    "Bind the mm file extension to the same rules as cxx"
+    return self.create_compiled_task("cxx", node)
