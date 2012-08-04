@@ -32,7 +32,7 @@ def configure(cnf):
     if cnf.cxx_std == "c++11":
         cnf.env.append_unique("CXXFLAGS", ["-std=c++11", "-stdlib=libc++"])
     elif cnf.cxx_std == "c++98":
-        cnf.env.append_unique("CXXFLAGS", ["-std=c++98", "-stdlib=libstdc++"])
+        cnf.env.append_unique("CXXFLAGS", ["-std=c++98"])
 
     if cnf.options.mode == "opt":
         cnf.env.append_unique("CFLAGS", ["-Os", "-DNDEBUG"])
