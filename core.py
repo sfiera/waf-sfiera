@@ -31,6 +31,7 @@ def configure(cnf):
         cnf.cxx_std = "c++98"
     if cnf.cxx_std == "c++11":
         cnf.env.append_unique("CXXFLAGS", ["-std=c++11", "-stdlib=libc++"])
+        cnf.env.append_unique("LIB", "c++")
     elif cnf.cxx_std == "c++98":
         cnf.env.append_unique("CXXFLAGS", ["-std=c++98"])
 
