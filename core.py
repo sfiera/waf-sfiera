@@ -4,7 +4,6 @@ import sys
 import textwrap
 from waflib.Configure import conf
 from waflib.Utils import to_list, unversioned_sys_platform
-from waflib.TaskGen import before_method, feature
 
 def dedent(s):
     return textwrap.dedent(s.strip("\n")).strip("\n")
@@ -21,6 +20,20 @@ def options(opt):
     opt.load("platform_%s" % unversioned_sys_platform())
 
 def configure(cnf):
+    if not hasattr(cnf, "c_std"):
+        cnf.c_std = "c99"
+    if cnf.c_std == "c89":
+        cnf.env.append_unique("CFLAGS", ["-std=c89"])
+    elif cnf.c_std == "c99":
+        cnf.env.append_unique("CFLAGS", ["-std=c99"])
+
+    if not hasattr(cnf, "cxx_std"):
+        cnf.cxx_std = "c++98"
+    if cnf.cxx_std == "c++11":
+        cnf.env.append_unique("CXXFLAGS", ["-std=c++11", "-stdlib=libc++"])
+    elif cnf.cxx_std == "c++98":
+        cnf.env.append_unique("CXXFLAGS", ["-std=c++98", "-stdlib=libstdc++"])
+
     if cnf.options.mode == "opt":
         cnf.env.append_unique("CFLAGS", ["-Os", "-DNDEBUG"])
         cnf.env.append_unique("CXXFLAGS", ["-Os", "-DNDEBUG"])
@@ -40,11 +53,3 @@ def platform(ctx, target, platform, **kwds):
     for key, val in kwds.items():
         setattr(target, key, to_list(getattr(target, key, [])))
         getattr(target, key).extend(to_list(val))
-
-
-@feature("cxx11")
-@before_method("process_source")
-def cxx11(self):
-    self.env.append_unique("CXXFLAGS", ["-std=c++11", "-stdlib=libc++"])
-    self.env.append_unique("DEFINES", "GTEST_USE_OWN_TR1_TUPLE=1")
-    self.env.append_unique("LIB", "c++")
