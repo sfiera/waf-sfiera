@@ -4,6 +4,7 @@ import sys
 import textwrap
 from waflib.Configure import conf
 from waflib.Utils import to_list, unversioned_sys_platform
+from waflib.TaskGen import before_method, feature
 
 def dedent(s):
     return textwrap.dedent(s.strip("\n")).strip("\n")
@@ -39,3 +40,11 @@ def platform(ctx, target, platform, **kwds):
     for key, val in kwds.items():
         setattr(target, key, to_list(getattr(target, key, [])))
         getattr(target, key).extend(to_list(val))
+
+
+@feature("cxx11")
+@before_method("process_source")
+def cxx11(self):
+    self.env.append_unique("CXXFLAGS", ["-std=c++11", "-stdlib=libc++"])
+    self.env.append_unique("DEFINES", "GTEST_USE_OWN_TR1_TUPLE=1")
+    self.env.append_unique("LIB", "c++")
