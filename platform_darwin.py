@@ -86,6 +86,12 @@ def options(opt):
         raise opt.errors.ConfigurationError("must set default_sdk")
     if not hasattr(opt, "default_compiler"):
         raise opt.errors.ConfigurationError("must set default_compiler")
+
+    if hasattr(opt, "platform_darwin_initialized"):
+        return
+    else:
+        opt.platform_darwin_initialized = True
+
     opt.add_option(
             "--sdk", action="store", default=opt.default_sdk, choices=sorted(SDKS.keys()),
             help="Compile against this SDK on darwin.  [default: %r]" % opt.default_sdk)
