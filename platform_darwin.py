@@ -38,6 +38,12 @@ SDKS = {
         "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.7.sdk", "-mmacosx-version-min=10.7"],
         "UNIVERSAL_ARCHES": ["i386", "x86_64"],
     },
+    "10.8": {
+        "CFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.8.sdk", "-mmacosx-version-min=10.8"],
+        "CXXFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.8.sdk", "-mmacosx-version-min=10.8"],
+        "LINKFLAGS": ["-isysroot", "/Developer/SDKs/MacOSX10.8.sdk", "-mmacosx-version-min=10.8"],
+        "UNIVERSAL_ARCHES": ["i386", "x86_64"],
+    },
 }
 
 COMPILERS = {
@@ -72,6 +78,12 @@ COMPILERS = {
         "LINK_CXX": "clang++",
     },
     ("10.7", "clang"): {
+        "CC": "clang",
+        "CXX": "clang++",
+        "LINK_CC": "clang",
+        "LINK_CXX": "clang++",
+    },
+    ("10.8", "clang"): {
         "CC": "clang",
         "CXX": "clang++",
         "LINK_CC": "clang",
