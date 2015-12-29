@@ -19,7 +19,6 @@ for sdk in glob.glob(SDK_ROOT + "/MacOSX10.*.sdk"):
         continue
     flags = [
         "-isysroot", SDK_ROOT + "/MacOSX10.%d.sdk" % version,
-        "-mmacosx-version-min=10.%d" % version,
     ]
     SDKS[version] = {
         "CFLAGS": flags,
@@ -29,6 +28,7 @@ for sdk in glob.glob(SDK_ROOT + "/MacOSX10.*.sdk"):
     }
 
 LATEST_SDK = "10.%d" % max(SDKS)
+MAC_TARGETS = ["10.%d" % x for x in xrange(max(SDKS), 4, -1)]
 SDKS = {"10.%d" % k: v for k, v in sorted(SDKS.iteritems())}
 
 CLANG = {
@@ -43,6 +43,10 @@ ARCH = ["i386", "x86_64"]
 def options(opt):
     if not hasattr(opt, "default_sdk"):
         opt.default_sdk = LATEST_SDK
+    if not hasattr(opt, "mac_target"):
+        raise opt.errors.ConfigurationError("must set mac_target")
+    elif opt.mac_target not in MAC_TARGETS:
+        raise opt.errors.ConfigurationError("mac_target must be one of %r" % MAC_TARGETS)
 
     if hasattr(opt, "platform_darwin_initialized"):
         return
@@ -60,6 +64,9 @@ def options(opt):
             """))
 
 def configure(cnf):
+    for key in ["CFLAGS", "CXXFLAGS", "LINKFLAGS"]:
+        cnf.env.append_unique(key, "-mmacosx-version-min=%s" % cnf.mac_target)
+
     for key, val in SDKS[cnf.options.sdk].items():
         if isinstance(val, list):
             cnf.env.append_unique(key, val)
